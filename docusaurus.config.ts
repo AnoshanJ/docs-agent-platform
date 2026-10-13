@@ -76,6 +76,30 @@ const config: Config = {
   headTags: [
     {
       tagName: 'script',
+      attributes: {type: 'application/ld+json'},
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'Organization',
+            '@id': 'https://wso2.com/#organization',
+            name: 'WSO2 LLC',
+            url: 'https://wso2.com',
+            logo: 'https://wso2.com/agent-platform/docs/img/WSO2-Logo.png',
+          },
+          {
+            '@type': 'WebSite',
+            '@id': 'https://wso2.com/agent-platform/docs/#website',
+            name: 'WSO2 Agent Manager Documentation',
+            url: 'https://wso2.com/agent-platform/docs/',
+            inLanguage: 'en',
+            publisher: {'@id': 'https://wso2.com/#organization'},
+          },
+        ],
+      }),
+    },
+    {
+      tagName: 'script',
       attributes: {
         src: 'https://cookie-cdn.cookiepro.com/scripttemplates/otSDKStub.js',
         type: 'text/javascript',
@@ -133,7 +157,18 @@ const config: Config = {
   themes: ['@docusaurus/theme-mermaid'],
 
   plugins: [
-    '@signalwire/docusaurus-plugin-llms-txt',
+    [
+      '@signalwire/docusaurus-plugin-llms-txt',
+      {
+        content: {
+          // Redirect-only pages (src/pages) have no content to convert.
+          excludeRoutes: [
+            '/agent-platform/docs/',
+            '/agent-platform/docs/docs/**',
+          ],
+        },
+      },
+    ],
     [
       require.resolve('docusaurus-lunr-search'),
       {
@@ -180,6 +215,7 @@ const config: Config = {
             current: {
               label: 'Next',
               banner: 'unreleased',
+              noIndex: true,
             },
             cloud: {
               label: 'Cloud',
@@ -200,6 +236,11 @@ const config: Config = {
             'https://github.com/wso2/docs-agent-platform/edit/main/',
         },
         blog: false, // Disable blog until we have content
+        sitemap: {
+          changefreq: null,
+          priority: null,
+          ignorePatterns: ['/agent-platform/docs/search/**'],
+        },
         theme: {
           // Order matters: amp-theme.css layers the site theme over
           // custom.css and relies on loading second to win on equal
@@ -217,6 +258,10 @@ const config: Config = {
 
     // Replace with your project's social card
     // image: 'img/amp-social-card.png',
+    metadata: [
+      {property: 'og:site_name', content: 'WSO2 Agent Manager'},
+      {property: 'og:type', content: 'website'},
+    ],
     announcementBar: {
       // Announce latestVersion (versions.json), NOT quickStartDockerTag. The latter is the
       // container image tag the quick-start guide pins, and it moves for reasons that have
