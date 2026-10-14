@@ -15,7 +15,7 @@ Use the **Run One Command** tab under [Install](#install): one script creates th
 :::
 
 :::info WSO2 subscription
-With a WSO2 subscription, you install the WSO2-supported build from `registry.wso2.com`. Select the **WSO2 Subscription** tab wherever this guide shows one, and see [Install with a WSO2 Subscription](./install-with-a-wso2-subscription.mdx) for your credentials and registry project.
+With a WSO2 subscription or evaluation, you install the WSO2-supported build from `registry.wso2.com`. Select the **WSO2 Subscription** tab wherever this guide shows one, and see [Install with a WSO2 Subscription](./install-with-a-wso2-subscription.mdx) for your credentials and registry project.
 :::
 
 :::info Stronger agent isolation tiers
@@ -332,7 +332,7 @@ export INSTRUMENTATION_URL="http://default-default.gateway.localhost:19080/otel"
 In k3d, every management endpoint is accessed through a plane gateway using a hostname: Thunder, the Console, and the API via the Control Plane kgateway on port 8080 (`thunder.amp.localhost`, `console.amp.localhost`, `api.amp.localhost`), and the Agent Manager Observer via the Observability Plane kgateway on port 11080 (`traces.amp.localhost`). These match the chart defaults and the Control Plane / Observability Plane OIDC configuration. No port-forwarding is needed; `*.localhost` names resolve to the loopback address in browsers and curl.
 :::
 
-With a WSO2 subscription, also point the charts at your registry project and sign Helm in to `registry.wso2.com`:
+With a WSO2 subscription or evaluation, also point the charts at your registry project and sign Helm in to `registry.wso2.com`:
 
 <Tabs groupId="distribution" queryString>
 <TabItem value="community" label="Community" default>
