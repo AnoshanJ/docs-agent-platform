@@ -5,19 +5,21 @@ description: Install the WSO2-supported build of Agent Manager from registry.wso
 
 # Install with a WSO2 Subscription
 
-A WSO2 subscription gives you the WSO2-supported build of WSO2 Agent Manager: the same platform as the community release, with update levels that carry fixes on top of the release. Its Helm charts and images are published to `registry.wso2.com` and signed by WSO2. You install it with the [k3d](./on-k3d.mdx) or [On Your Environment](./on-your-environment.mdx) guide, using the changes on this page.
+A WSO2 subscription, or an evaluation of one, gives you the WSO2-supported build of WSO2 Agent Manager. It is the same platform as the community release, with update levels that carry fixes on top of the release. Its Helm charts and images are published to `registry.wso2.com` and signed by WSO2. You install it with the [k3d](./on-k3d.mdx) or [On Your Environment](./on-your-environment.mdx) guide, using the changes on this page.
 
-## Prerequisites
+## Get Your Registry Credentials
 
-- The registry credentials WSO2 emailed you: a username, which starts with `robot$`, and a token.
-- The registry project named in that email:
+How you get registry credentials, and which registry project they open, depends on how you obtained Agent Manager.
 
-| Subscription | Registry project |
-|---|---|
-| Evaluation, from signing up on the WSO2 website | `wso2-agent-manager-evaluations` |
-| Paid subscription | `wso2-agent-manager` |
+### Evaluation
 
-The rest of this page writes the project as `<project>`.
+When you download Agent Manager from the WSO2 website for evaluation, WSO2 emails you registry credentials: a username and a token. Your registry project is `wso2-agent-manager-evaluations`.
+
+### Subscription
+
+With a WSO2 subscription, get your registry credentials from the WSO2 Customer Portal, under **Settings** → **Registry Tokens**. See [Registry Token Management](https://updates.docs.wso2.com/en/latest/updates/registry-token-management/) for how to create and manage them. Your registry project is `wso2-agent-manager`.
+
+The rest of this page writes the registry project as `<project>`, and calls the username and token your registry credentials.
 
 ## What Changes From the Community Install
 
@@ -80,13 +82,13 @@ Follow the [On Your Environment](./on-your-environment.mdx) guide and select the
 
 ```bash
 cat > ~/amp-registry.creds <<'EOF'
-AMP_REGISTRY_USERNAME='robot$<project>+<name>'
+AMP_REGISTRY_USERNAME='<username>'
 AMP_REGISTRY_PASSWORD=<token>
 EOF
 chmod 600 ~/amp-registry.creds
 ```
 
-Keep the single quotes around the username. Registry usernames contain `$`, which a shell would otherwise expand.
+Keep the single quotes around the username. A registry username can contain `$`, which a shell would otherwise expand.
 
 ```bash
 curl -fsSL https://github.com/wso2/agent-manager/releases/download/amp/v1.0.0/k3d-install-subscription.sh | AMP_REGISTRY_CREDENTIALS_FILE=~/amp-registry.creds bash -s -- --project <project>
@@ -135,7 +137,7 @@ A valid signature prints the verified claims for the image or chart. An error me
 
 ### Helm Fails With 401 Unauthorized
 
-Helm is not signed in to `registry.wso2.com`. Run the `helm registry login` command from the **WSO2 Subscription** tab again, and check the username and token in your email.
+Helm is not signed in to `registry.wso2.com`. Run the `helm registry login` command from the **WSO2 Subscription** tab again, and check your [registry credentials](#get-your-registry-credentials).
 
 ### Agent Manager Pods Stay in ImagePullBackOff
 
