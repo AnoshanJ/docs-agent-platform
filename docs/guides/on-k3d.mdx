@@ -14,6 +14,10 @@ Install the Agent Manager on a local Kubernetes cluster using [k3d](https://k3d.
 Use the **Run One Command** tab under [Install](#install): one script creates the cluster and installs everything. Use the **Guided Install** tab when you want to understand the full setup or need to customize it. The [Quick Start Guide](../get-started/quick-start.mdx) runs the same installer inside a dev container, if you'd rather not install k3d, kubectl and Helm on your machine.
 :::
 
+:::info WSO2 subscription
+With a WSO2 subscription, you install the WSO2-supported build from `registry.wso2.com`. Select the **WSO2 Subscription** tab wherever this guide shows one, and see [Install with a WSO2 Subscription](./install-with-a-wso2-subscription.mdx) for your credentials and registry project.
+:::
+
 :::info Stronger agent isolation tiers
 Agents run sandboxed under the standard **runc** runtime by default. Agent Manager also supports stronger per-environment isolation tiers — **gVisor** (userspace kernel) and **Kata Containers** (per-agent VM) — but they have hardware/OS requirements and need a dedicated node. For more information, see the [gVisor](./isolation-tiers/gvisor.mdx) and [Kata Containers](./isolation-tiers/kata.mdx) setup guides.
 :::
@@ -68,6 +72,8 @@ colima start --profile agent-manager \
 
 Choose `--cpu` and `--memory` now rather than adjusting them later. Changing either requires restarting the VM, which can leave an already-created k3d cluster unable to start. [Troubleshooting](#troubleshooting) covers the recovery if you hit this.
 
+On Apple silicon, install Rosetta 2 first (`softwareupdate --install-rosetta`). Without it, Colima runs amd64 images, including the images built for platform-hosted agents, under QEMU emulation, and a Python agent can take longer to start than its startup probe allows.
+
 For the guided install, prefix the cluster creation command in Step 1 with `K3D_FIX_DNS=0`. The one-command installer sets it for you.
 :::
 
@@ -98,9 +104,24 @@ Pick how you want to install it:
 
 One script creates the cluster and installs every plane, plus Agent Manager:
 
+<Tabs groupId="distribution" queryString>
+<TabItem value="community" label="Community" default>
+
 ```bash
 curl -fsSL https://github.com/wso2/agent-manager/releases/download/amp/v0.0.0-dev/k3d-install.sh | bash
 ```
+
+</TabItem>
+<TabItem value="subscription" label="WSO2 Subscription">
+
+```bash
+curl -fsSL https://github.com/wso2/agent-manager/releases/download/amp/v0.0.0-dev/k3d-install-subscription.sh | bash -s -- --project <project>
+```
+
+Replace `<project>` with the registry project from your WSO2 email. The script asks for your registry credentials and installs the newest update level published to that project. See [Install with a WSO2 Subscription](./install-with-a-wso2-subscription.mdx#one-command) for its options.
+
+</TabItem>
+</Tabs>
 
 The script:
 
@@ -310,6 +331,29 @@ export INSTRUMENTATION_URL="http://default-default.gateway.localhost:19080/otel"
 :::info
 In k3d, every management endpoint is accessed through a plane gateway using a hostname: Thunder, the Console, and the API via the Control Plane kgateway on port 8080 (`thunder.amp.localhost`, `console.amp.localhost`, `api.amp.localhost`), and the Agent Manager Observer via the Observability Plane kgateway on port 11080 (`traces.amp.localhost`). These match the chart defaults and the Control Plane / Observability Plane OIDC configuration. No port-forwarding is needed; `*.localhost` names resolve to the loopback address in browsers and curl.
 :::
+
+With a WSO2 subscription, also point the charts at your registry project and sign Helm in to `registry.wso2.com`:
+
+<Tabs groupId="distribution" queryString>
+<TabItem value="community" label="Community" default>
+
+Nothing to change. The charts come from `ghcr.io/wso2`.
+
+</TabItem>
+<TabItem value="subscription" label="WSO2 Subscription">
+
+Replace `<update level>` and `<project>` with your values from [Install with a WSO2 Subscription](./install-with-a-wso2-subscription.mdx). Phase 2 uses the same username and token to create the image pull secret.
+
+```bash
+export VERSION="0.0.0-dev-<update level>"
+export HELM_CHART_REGISTRY="registry.wso2.com/<project>"
+printf 'Registry username: ' && read -r AMP_REGISTRY_USERNAME
+printf 'Registry token: ' && stty -echo && read -r AMP_REGISTRY_PASSWORD; stty echo; echo
+printf '%s' "$AMP_REGISTRY_PASSWORD" | helm registry login registry.wso2.com --username "$AMP_REGISTRY_USERNAME" --password-stdin
+```
+
+</TabItem>
+</Tabs>
 
 ### Step 6: Install Thunder Extension (Identity Provider)
 

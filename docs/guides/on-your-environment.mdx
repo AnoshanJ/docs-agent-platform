@@ -14,6 +14,10 @@ Set up a production-grade, single-cluster Agent Manager deployment on an existin
 The [Quick Start Guide](../get-started/quick-start.mdx) installs everything in a single command using a dev container with k3d, the [k3d guide](./on-k3d.mdx) covers a local cluster install, and the [VM guide](./on-a-vm.mdx) covers a single-machine install. Use this page when you are deploying to a real cluster.
 :::
 
+:::info WSO2 subscription
+With a WSO2 subscription, you install the WSO2-supported build from `registry.wso2.com`. Select the **WSO2 Subscription** tab wherever this guide shows one, and see [Install with a WSO2 Subscription](./install-with-a-wso2-subscription.mdx) for your credentials and registry project.
+:::
+
 :::info Stronger agent isolation tiers
 Agents run sandboxed under the standard **runc** runtime by default. Agent Manager also supports stronger per-environment isolation tiers — **gVisor** (userspace kernel) and **Kata Containers** (per-agent VM) — but they have hardware/OS requirements and need a dedicated node. For more information, see the [gVisor](./isolation-tiers/gvisor.mdx) and [Kata Containers](./isolation-tiers/kata.mdx) setup guides.
 :::
@@ -154,6 +158,29 @@ export THUNDER_INTERNAL_URL="http://amp-thunder-extension-service.${THUNDER_NS}.
 # Trace-export endpoint shown to agent developers (see the OTLP note below)
 export INSTRUMENTATION_URL="http://default-default.gateway.localhost:19080/otel"
 ```
+
+With a WSO2 subscription, also point the charts at your registry project and sign Helm in to `registry.wso2.com`:
+
+<Tabs groupId="distribution" queryString>
+<TabItem value="community" label="Community" default>
+
+Nothing to change. The charts come from `ghcr.io/wso2`.
+
+</TabItem>
+<TabItem value="subscription" label="WSO2 Subscription">
+
+Replace `<update level>` and `<project>` with your values from [Install with a WSO2 Subscription](./install-with-a-wso2-subscription.mdx). Phase 2 uses the same username and token to create the image pull secret.
+
+```bash
+export VERSION="0.0.0-dev-<update level>"
+export HELM_CHART_REGISTRY="registry.wso2.com/<project>"
+printf 'Registry username: ' && read -r AMP_REGISTRY_USERNAME
+printf 'Registry token: ' && stty -echo && read -r AMP_REGISTRY_PASSWORD; stty echo; echo
+printf '%s' "$AMP_REGISTRY_PASSWORD" | helm registry login registry.wso2.com --username "$AMP_REGISTRY_USERNAME" --password-stdin
+```
+
+</TabItem>
+</Tabs>
 
 :::note Hostname shape
 The certificates below are single-level wildcards (`*.<base>`), so every management hostname must sit directly under the base domain — no second-level names like `api.amp.<base>`.
