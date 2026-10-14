@@ -61,6 +61,7 @@ const sidebars: SidebarsConfig = {
             'guides/on-k3d',
             'guides/on-your-environment',
             'guides/on-a-vm',
+            'guides/install-with-a-wso2-subscription',
             'guides/cli-installation',
           ],
         },
