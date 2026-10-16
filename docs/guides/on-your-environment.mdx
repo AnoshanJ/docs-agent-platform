@@ -169,10 +169,10 @@ Nothing to change. The charts come from `ghcr.io/wso2`.
 </TabItem>
 <TabItem value="subscription" label="WSO2 Subscription">
 
-Replace `<update level>` and `<project>` with your values from [Install with a WSO2 Subscription](./install-with-a-wso2-subscription.mdx). Phase 2 uses the same username and token to create the image pull secret.
+Replace `<version>` and `<project>` with your values from [Install with a WSO2 Subscription](./install-with-a-wso2-subscription.mdx). The version is `0.0.0-dev` for the release, or `0.0.0-dev-u<N>` for update N. Phase 2 uses the same username and token to create the image pull secret.
 
 ```bash
-export VERSION="0.0.0-dev-<update level>"
+export VERSION="<version>"
 export HELM_CHART_REGISTRY="registry.wso2.com/<project>/helm-charts"
 printf 'Registry username: ' && read -r AMP_REGISTRY_USERNAME
 printf 'Registry token: ' && stty -echo && read -r AMP_REGISTRY_PASSWORD; stty echo; echo
