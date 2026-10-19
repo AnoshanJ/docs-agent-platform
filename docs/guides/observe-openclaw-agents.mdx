@@ -12,7 +12,7 @@ Tested with OpenClaw 2026.10.4.
 What works:
 
 - Agent runs, LLM calls, and tool calls appear as agent, LLM, and tool spans.
-- The trace list shows input, output, and token usage for each agent run.
+- The trace list shows input and token usage for each agent run, and output when the run produces a final model response.
 
 Known limitations:
 
@@ -33,8 +33,8 @@ Known limitations:
 2. Select **Externally-Hosted Agent**, enter a name, and click **Register**. The **Setup Agent** panel opens.
 3. In **Language**, select **Other**.
 4. In the **Configure Your OTLP Exporter** step, copy two values:
-   - The `OTEL_EXPORTER_OTLP_ENDPOINT` value. This is your OTel endpoint.
-   - The key after `x-amp-api-key=` in `OTEL_EXPORTER_OTLP_HEADERS`. This is your API key.
+   - The `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` value, without the trailing `/v1/traces`. This is your OTel endpoint.
+   - The key after `x-amp-api-key=` in `OTEL_EXPORTER_OTLP_TRACES_HEADERS`. This is your API key.
 
 The panel generates an API key automatically the first time it opens after registration, and shows it only once. If the key shows as `ey***`, select a **Token Duration** and click **Generate** to create a new one.
 
@@ -88,7 +88,11 @@ Replace the placeholders:
 The settings that matter for Agent Manager:
 
 - `env.vars.OTEL_SEMCONV_STABILITY_OPT_IN` makes the plugin name LLM spans with the OpenTelemetry GenAI semantic conventions (for example, `chat <model>`). Without it, the plugin uses its own span names and attributes.
-- `captureContent` adds prompts and completions to spans. The Console needs them to show input and output. Set it to `false` if prompts must not leave the machine.
+- `captureContent` adds prompts, completions, tool arguments, tool results, and tool definitions to spans. The Console needs this content to show input and output.
+
+:::warning Content capture
+With `captureContent` set to `true`, OpenClaw sends conversation and tool content to Agent Manager. Enable it only when your organization approves storing that content in Agent Manager and its retention policy. OpenClaw 2026.10.4 has no narrower capture setting, so set it to `false` to export spans without content.
+:::
 
 :::note Gateway environment
 The OpenClaw gateway runs as a background service (launchd on macOS, systemd on Linux). It does not inherit variables you `export` in a shell. Set variables in `env.vars` as shown, and do not reference shell variables such as `${AMP_AGENT_API_KEY}` in `headers` unless they are set in the gateway's environment.
