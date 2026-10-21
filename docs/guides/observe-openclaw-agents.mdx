@@ -128,7 +128,7 @@ openclaw gateway restart
 |---|---|
 | No traces appear | Check that `endpoint` and `x-amp-api-key` are correct. A request to `<otel-endpoint>/v1/traces` without a valid key returns `401`. Restart the gateway after any config change. |
 | LLM spans are named `openclaw.model.call` | `OTEL_SEMCONV_STABILITY_OPT_IN` is not set in the gateway's environment. Add it to `env.vars` and restart the gateway. |
-| The **Input** and **Output** columns are empty | Set `captureContent` to `true` and restart the gateway. |
+| The **Input** and **Output** columns are empty | Set `captureContent` to `true` and restart the gateway. **Output** stays empty for runs that end without a final model response, such as tool-only runs. |
 | The trace list is full of `openclaw.gateway.rpc.*` traces | The OpenClaw Control UI generates these. Close the Control UI while testing, or route traces through an OpenTelemetry Collector that drops these spans before they reach Agent Manager. |
 
 ## Related
